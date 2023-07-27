@@ -40,10 +40,10 @@ class TicketManager {
   }
 }
 
-/* const show = new TicketManager();
+const show = new TicketManager();
 show.addEvent("Duki", "Ezeiza", 10, 200, '2/8/2023');
 show.addEvent("Duki", "Ezeiza", 40, 100, '5/8/2023');
 show.addEvent("Duki", "Ezeiza", 20, 400, '29/8/2023');
 show.addUsers(2,'Jose Fernandez')
 show.eventTour(3, "Berlin", "28/9/2023")
-console.log(show.events) */
+console.log(show.events) 

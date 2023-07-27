@@ -49,7 +49,7 @@ class ProductManager {
   }
 }
 
-/*const dm = new ProductManager();
+const dm = new ProductManager();
 dm.addProduct("hola","god", 45, "img/uster.jpg", '#50421', 10)
-dm.addProduct("iphone X","buen celular", 450, "img/uster2.jpg", '#50441', 15) */
+dm.addProduct("iphone X","buen celular", 450, "img/uster2.jpg", '#50441', 15)
 
