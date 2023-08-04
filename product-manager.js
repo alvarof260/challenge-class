@@ -1,55 +1,114 @@
+import { readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+
 class ProductManager {
-  #products;
-  constructor() {
-    this.#products = [];
+  #path;
+  constructor(path) {
+    this.#path = path;
+    this.#init();
   }
-  getProducts() {
-    return this.#products;
-  }
-  addProduct(title, description, price, thumbnail, code, stock) {
-    if (
-      title &&
-      description &&
-      price &&
-      thumbnail &&
-      code &&
-      stock &&
-      !this.codeInProducts(code)
-    ) {
-      const id = this.generatorID();
-      return this.#products.push({
-        id,
-        title,
-        description,
-        price,
-        thumbnail,
-        code,
-        stock,
-      });
-    } else {
-      throw new Error(
-        "este producto no se puede agregar porque tiene mismo codigo a uno que ya esta en el array o falto completar un campo"
-      );
+  async #init() {
+    if (!existsSync(this.#path)) {
+      await writeFile(this.#path, JSON.stringify([], null, "/t"));
     }
   }
-  codeInProducts(codeProd) {
-    return this.#products.some((el) => el.code === codeProd);
+  async getProducts() {
+    const response = await readFile(this.#path, "utf-8");
+    const parseResponse = JSON.parse(response);
+    return parseResponse;
+  } 
+  async addProduct(product) {
+    if (
+      product.title &&
+      product.description &&
+      product.price &&
+      product.thumbnail &&
+      product.code &&
+      product.stock
+    ) {
+      const response = await this.getProducts();
+      const found = response.find(el=> el.code === product.code)
+      if(found) return
+      product.id = this.generatorID(response);
+      response.push(product);
+      await writeFile("challenge-class/products.json", JSON.stringify(response, null, "\t"))
+      return product;
+    }
   }
-  generatorID() {
-    if (this.#products.length === 0) return 1;
-    return this.#products[this.#products.length - 1].id + 1;
+  generatorID(products) {
+    if (products.length === 0) return 1;
+    return products[products.length - 1].id + 1;
   }
-  getProductByID(idProd) {
-    const product = this.#products.find((el) => el.id === idProd);
+  
+  async getProductByID(idProd) {
+    const products = await this.getProducts()
+    const product = products.find((el) => el.id === idProd);
     if (product) {
       return product;
     } else {
       throw new Error(`id:${idProd}, not found`);
     }
+  } 
+  async productUpdate(itemId, updatedProduct){
+    const products = await this.getProducts()
+    const productsUpdates = products.map(item=>{
+      if(item.id === itemId ){
+        return {...item, ...updatedProduct}
+      } else{
+        return item
+      }
+    })
+    await writeFile(this.#path, JSON.stringify(productsUpdates, null, "\t"))
+    return productsUpdates.find(el => el.id === itemId)
+  }
+  async productDelete(itemId){
+    const products = await this.getProducts()
+    const found = products.find(el=> el.id === itemId)
+    if(!found) return
+    const position = products.indexOf(el=> el.id === itemId)
+    const productsUpdates = products.splice(position, 1)
+    await writeFile(this.#path, JSON.stringify(productsUpdates, null, "\t"))
+    return found
   }
 }
 
-const dm = new ProductManager();
-dm.addProduct("hola","god", 45, "img/uster.jpg", '#50421', 10)
-dm.addProduct("iphone X","buen celular", 450, "img/uster2.jpg", '#50441', 15)
+const productManager = new ProductManager("challenge-class/products.json");
 
+const test = async () => {
+  /*  ver productos   */
+  console.log("---------------!----------------")
+  console.log(await productManager.getProducts());
+  /* agregar productos */
+  console.log("---------------!----------------")
+  console.log(await productManager.addProduct({title:"sin titulo",description:"sin desc.",price:250,thumbnail:"no imagen",code:"b0452",stock:10}));
+  
+  /* ver productos  */
+  console.log("---------------!----------------")
+  console.log(await productManager.getProducts());
+  
+  console.log("---------------!----------------")
+  console.log(await productManager.addProduct({title:"sin titulo",description:"sin desc.",price:250,thumbnail:"no imagen",code:"b0452",stock:10}));
+
+  console.log("---------------!----------------")
+  console.log(await productManager.getProducts()); 
+
+  console.log("---------------!----------------")
+  console.log(await productManager.addProduct({title:"sin titulo",description:"sin desc.",price:35000,thumbnail:"no imagen",code:"b5452",stock:15}));
+
+  console.log("---------------!----------------")
+  console.log(await productManager.getProducts()); 
+
+  console.log("---------------!----------------")
+  console.log(await productManager.getProductByID(1))
+
+  console.log("---------------!----------------")
+  console.log(await productManager.productUpdate(1,{title:"titulo cappoooo!"}))
+
+  console.log("---------------!----------------")
+  console.log(await productManager.productDelete(1))
+
+  console.log("---------------!----------------")
+  console.log(await productManager.getProducts())
+};
+
+test();

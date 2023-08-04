@@ -1,0 +1,11 @@
+[
+	{
+		"title": "sin titulo",
+		"description": "sin desc.",
+		"price": 35000,
+		"thumbnail": "no imagen",
+		"code": "b5452",
+		"stock": 15,
+		"id": 2
+	}
+]
