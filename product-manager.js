@@ -31,7 +31,7 @@ class ProductManager {
       if(found) return
       product.id = this.generatorID(response);
       response.push(product);
-      await writeFile("challenge-class/products.json", JSON.stringify(response, null, "\t"))
+      await writeFile("products.json", JSON.stringify(response, null, "\t"))
       return product;
     }
   }
@@ -72,17 +72,15 @@ class ProductManager {
   }
 }
 
-const productManager = new ProductManager("challenge-class/products.json");
+const productManager = new ProductManager("products.json");
 
 const test = async () => {
-  /*  ver productos   */
   console.log("---------------!----------------")
   console.log(await productManager.getProducts());
-  /* agregar productos */
+
   console.log("---------------!----------------")
   console.log(await productManager.addProduct({title:"sin titulo",description:"sin desc.",price:250,thumbnail:"no imagen",code:"b0452",stock:10}));
   
-  /* ver productos  */
   console.log("---------------!----------------")
   console.log(await productManager.getProducts());
   
